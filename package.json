@@ -1,0 +1,25 @@
+{
+  "name": "sf_surf_bot",
+  "version": "1.0.0",
+  "description": "Alexa skill that checks wave, wind and tide information for a number of surf spots near San Francisco",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tpeterson/sf_surf_bot.git"
+  },
+  "author": "Tim",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tpeterson/sf_surf_bot/issues"
+  },
+  "homepage": "https://github.com/tpeterson/sf_surf_bot#readme",
+  "dependencies": {
+    "alexa-app": "^2.3.4",
+    "cheerio": "^0.20.0",
+    "lodash": "^4.13.1",
+    "request": "^2.72.0"
+  }
+}
