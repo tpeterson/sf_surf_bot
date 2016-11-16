@@ -1,5 +1,4 @@
 'use strict';
-
 module.change_code = 1;
 
 const _ = require('lodash');
@@ -8,13 +7,13 @@ const app = new Alexa.app('sf_surfbot');
 const SurfDataHelper = require('./surf_data_helper');
 
 app.launch(function(req, res) {
-  let prompt = 'Where are you looking to surf';
+  var prompt = 'Where are you looking to surf';
   res.say(prompt).reprompt(prompt).shouldEndSession(false);
 });
 
 // RESPOND TO STOP/CANCEL REQUEST
-let exitFunction = function(request, response) {
-  let speechOutput = 'Talk to you later';
+var exitFunction = function(request, response) {
+  var speechOutput = 'Talk to you later';
   response.say(speechOutput);
 };
 
@@ -23,7 +22,7 @@ app.intent('AMAZON.CancelIntent', exitFunction);
 
 // RESPOND TO HELP REQUEST
 app.intent('AMAZON.HelpIntent', function(request, response) {
-    let speechOutput = 'I can report surf conditions for Mavericks, Ocean Beach and Pacifica. Where are you looking to surf?';
+    var speechOutput = 'I can report surf conditions for Mavericks, Ocean Beach and Pacifica. Where are you looking to surf?';
     response.say(speechOutput).shouldEndSession(false);
   });
 
@@ -35,19 +34,19 @@ app.intent('getSurfreport', {
   },
   function(req, res) {
     // GET THE SLOT
-    let locationName = req.slot('SURFSPOT');
-    let reprompt = 'Tell me the name of a surf spot to get a surf report';
+    var locationName = req.slot('SURFSPOT');
+    var reprompt = 'Tell me the name of a surf spot to get a surf report';
 
     if (_.isEmpty(locationName)) {
-      let prompt = 'Can you say the surf spot again';
+      var prompt = 'Can you say the surf spot again';
       res.say(prompt).reprompt(reprompt).shouldEndSession(false);
       return true;
     } else {
-      let surfHelper = new SurfDataHelper();
+      var surfHelper = new SurfDataHelper();
       surfHelper.whichSpot(locationName).then(function(report) {
         res.say(report).send();
       }).catch(function(err) {
-        let prompt = `I can\'t get a surf report for ${locationName || 'that spot'}`;
+        var prompt = `I can\'t get a surf report for ${locationName || 'that spot'}`;
         res.say(prompt).reprompt(reprompt).shouldEndSession(false).send();
       });
       return false;

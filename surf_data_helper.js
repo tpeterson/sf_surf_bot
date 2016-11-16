@@ -23,7 +23,7 @@ function SurfDataHelper() {
 
     let req_spot_info = checkSpot(req_spot);
 
-    return this.promFullReport(req_spot_info).then(function(response) {
+    return this.getFullReport(req_spot_info).then(function(response) {
       return response;
     });
   };
@@ -103,11 +103,6 @@ function SurfDataHelper() {
       });
     });
   };
-}
-
-if (!module.parent) {
-  let surfHelper = new SurfDataHelper();
-  surfHelper.whichSpot('mavericks').then((res)=>console.log(res));
 }
 
 module.exports = SurfDataHelper;
