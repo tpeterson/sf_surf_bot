@@ -1,57 +1,54 @@
 'use strict';
-module.change_code = 1;
 
-const _ = require('lodash');
-const Alexa = require('alexa-app');
-const app = new Alexa.app('sf_surfbot');
-const SurfDataHelper = require('./surf_data_helper');
+var Alexa = require('alexa-sdk');
+var SurfDataHelper = require('./surf_data_helper');
 
-app.launch(function(req, res) {
-  var prompt = 'Where are you looking to surf';
-  res.say(prompt).reprompt(prompt).shouldEndSession(false);
-});
-
-// RESPOND TO STOP/CANCEL REQUEST
-var exitFunction = function(request, response) {
-  var speechOutput = 'Talk to you later';
-  response.say(speechOutput);
+exports.handler = function(event, context, callback) {
+    var alexa = Alexa.handler(event, context);
+    alexa.registerHandlers(handlers);
+    alexa.execute();
 };
 
-app.intent('AMAZON.StopIntent', exitFunction);
-app.intent('AMAZON.CancelIntent', exitFunction);
-
-// RESPOND TO HELP REQUEST
-app.intent('AMAZON.HelpIntent', function(request, response) {
-    var speechOutput = 'I can report surf conditions for Mavericks, Ocean Beach and Pacifica. Where are you looking to surf?';
-    response.say(speechOutput).shouldEndSession(false);
-  });
-
-app.intent('getSurfreport', {
-    'slots': {
-      'SURFSPOT': 'LIST_OF_LOCATIONS'
+var handlers = {
+    'LaunchRequest': function () {
+        this.attributes['speechOutput'] = 'You can tell Alexa to ask S.F. Surf Bot how are the waves at Mavericks or Ocean Beach or Pacifica.';
+        this.attributes['repromptSpeech'] = 'Where are you looking to surf?';
+        this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
     },
-    'utterances': ['{|what are|how are|how is|what is|how\'s|what\'s} {|the} {|waves|surf|conditions} {|for|at} {-|SURFSPOT}']
-  },
-  function(req, res) {
-    // GET THE SLOT
-    var locationName = req.slot('SURFSPOT');
-    var reprompt = 'Tell me the name of a surf spot to get a surf report';
+    'getSurfreport': function() {
+      var itemSlot = this.event.request.intent.slots.Item;
+      if (itemSlot && itemSlot.value) {
+        var locationName = itemSlot.value.trim().toLowerCase();
+      }
 
-    if (_.isEmpty(locationName)) {
-      var prompt = 'Can you say the surf spot again';
-      res.say(prompt).reprompt(reprompt).shouldEndSession(false);
-      return true;
-    } else {
-      var surfHelper = new SurfDataHelper();
-      surfHelper.whichSpot(locationName).then(function(report) {
-        res.say(report).send();
-      }).catch(function(err) {
-        var prompt = `I can\'t get a surf report for ${locationName || 'that spot'}`;
-        res.say(prompt).reprompt(reprompt).shouldEndSession(false).send();
+      if (_.isEmpty(locationName)) {
+        this.attributes['speechOutput'] = 'Sorry, I didn\'t catch that.';
+        this.attributes['repromptSpeech'] = 'Where are you looking to surf?';
+        this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
       });
-      return false;
+      } else {
+        var surfHelper = new SurfDataHelper();
+        surfHelper.whichSpot(locationName).then(function(report) {
+          this.emit(':tell', report);
+        }).catch(function(err) {
+          this.attributes['speechOutput'] = `I can\'t get a surf report for ${locationName || 'that spot'}`;
+          this.attributes['repromptSpeech'] = 'Where are you looking to surf?';
+          this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
+        });
+      }
+    },
+    'AMAZON.HelpIntent': function () {
+        this.attributes['speechOutput'] = 'You can tell Alexa to ask S.F. Surf Bot how are the waves at Mavericks or Ocean Beach or Pacifica.';
+        this.attributes['repromptSpeech'] = 'Where are you looking to surf?';
+        this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech'])
+    },
+    'AMAZON.StopIntent': function () {
+        this.emit('SessionEndedRequest');
+    },
+    'AMAZON.CancelIntent': function () {
+        this.emit('SessionEndedRequest');
+    },
+    'SessionEndedRequest':function () {
+        this.emit(':tell', 'Talk to you later');
     }
-  }
-);
-
-module.exports = app;
+};
