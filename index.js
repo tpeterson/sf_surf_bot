@@ -17,24 +17,22 @@ var handlers = {
         this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
     },
     'getSurfreport': function() {
-      var itemSlot = this.event.request.intent.slots.Item;
-      if (itemSlot && itemSlot.value) {
-        var locationName = itemSlot.value.trim().toLowerCase();
-      }
+      var itemSlot = this.event.request.intent.slots.SURFSPOT;
+      var locationName = locationName = itemSlot.value;
 
       if (_.isEmpty(locationName)) {
         this.attributes['speechOutput'] = 'Sorry, I didn\'t catch that.';
         this.attributes['repromptSpeech'] = 'Where are you looking to surf?';
         this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
-      });
       } else {
+        var echo = this;
         var surfHelper = new SurfDataHelper();
         surfHelper.whichSpot(locationName).then(function(report) {
-          this.emit(':tell', report);
+          echo.emit(':tell', report);
         }).catch(function(err) {
-          this.attributes['speechOutput'] = `I can\'t get a surf report for ${locationName || 'that spot'}`;
-          this.attributes['repromptSpeech'] = 'Where are you looking to surf?';
-          this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
+          echo.attributes['speechOutput'] = `I can\'t get a surf report for ${locationName || 'that spot'}`;
+          echo.attributes['repromptSpeech'] = 'Where are you looking to surf?';
+          echo.emit(':ask', echo.attributes['speechOutput'], echo.attributes['repromptSpeech']);
         });
       }
     },

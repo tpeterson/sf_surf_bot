@@ -1,18 +1,18 @@
 'use strict';
 
-const request = require('request');
-const surf_spots = require('./req_modules/surf_spots');
-const checkSurf = require('./req_modules/surfline');
-const checkWind = require('./req_modules/wu_wind');
-const checkTide = require('./req_modules/wu_tide');
-const relayConditions = require('./req_modules/relay_cond');
+var request = require('request');
+var surf_spots = require('./req_modules/surf_spots');
+var checkSurf = require('./req_modules/surfline');
+var checkWind = require('./req_modules/wu_wind');
+var checkTide = require('./req_modules/wu_tide');
+var relayConditions = require('./req_modules/relay_cond');
 
 function SurfDataHelper() {
   SurfDataHelper.prototype.whichSpot = function(text_input) {
-    let req_spot = text_input.trim().toLowerCase();
+    var req_spot = text_input.trim().toLowerCase();
 
     function checkSpot(name) {
-      let spot_info = {};
+      var spot_info = {};
       surf_spots.forEach(function(spot) {
         if (spot.name === name) {
           spot_info = spot;
@@ -21,7 +21,7 @@ function SurfDataHelper() {
       return spot_info;
     }
 
-    let req_spot_info = checkSpot(req_spot);
+    var req_spot_info = checkSpot(req_spot);
 
     return this.getFullReport(req_spot_info).then(function(response) {
       return response;
@@ -30,30 +30,36 @@ function SurfDataHelper() {
 
   SurfDataHelper.prototype.getFullReport = function(location) {
     return new Promise(function(resolve, reject) {
-      let surf = {};
-      let tide = {};
-      let wind = {};
+      var surf = {};
+      var tide = {};
+      var wind = {};
 
       request(location.surf_req, function(error, response, html) {
         if (!error && response.statusCode == 200) {
           surf = checkSurf(html);
 
           if (surf.spot && tide.type && wind.direction) {
-            resolve(relayConditions(surf, tide, wind));
+            var full_report = relayConditions(surf, tide, wind);
+            resolve(full_report);
           }
+        } else {
+          reject('Sorry, I\'m having trouble getting the surf report right now.');
         }
       });
 
       request(location.tide_req, function(error, response, html) {
         if (!error && response.statusCode == 200) {
-          let data = JSON.parse(response.body);
-          let tides_arr = data.tide.tideSummary;
+          var data = JSON.parse(response.body);
+          var tides_arr = data.tide.tideSummary;
 
           tide = checkTide(tides_arr);
 
           if (surf.spot && tide.type && wind.direction) {
-            resolve(relayConditions(surf, tide, wind));
+            var full_report = relayConditions(surf, tide, wind);
+            resolve(full_report);
           }
+        } else {
+          reject('Sorry, I\'m having trouble getting the surf report right now.');
         }
       });
 
@@ -62,8 +68,11 @@ function SurfDataHelper() {
           wind = checkWind(response.body);
 
           if (surf.spot && tide.type && wind.direction) {
-            resolve(relayConditions(surf, tide, wind));
+            var full_report = relayConditions(surf, tide, wind);
+            resolve(full_report);
           }
+        } else {
+          reject('Sorry, I\'m having trouble getting the surf report right now.');
         }
       });
     });
@@ -75,6 +84,8 @@ function SurfDataHelper() {
         request(location.surf_req, function(error, response, html) {
           if (!error && response.statusCode == 200) {
             resolve(checkSurf(html));
+          } else {
+            reject('Sorry, I\'m having trouble getting the surf report right now.');
           }
         });
       });
@@ -86,6 +97,8 @@ function SurfDataHelper() {
             let tides_arr = data.tide.tideSummary;
 
             resolve(checkTide(tides_arr));
+          } else {
+            reject('Sorry, I\'m having trouble getting the surf report right now.');
           }
         });
       });
@@ -94,12 +107,18 @@ function SurfDataHelper() {
         request(location.wind_req, function(error, response, body) {
           if (!error && response.statusCode == 200) {
             resolve(checkWind(response.body));
+          } else {
+            reject('Sorry, I\'m having trouble getting the surf report right now.');
           }
         });
       });
 
       Promise.all([surf_req, tide_req, wind_req]).then(function(results) {
-        resolve_full(relayConditions(results[0], results[1], results[2]));
+        if (results.length === 3) {
+          resolve_full(relayConditions(results[0], results[1], results[2]));
+        } else {
+          reject_full('Sorry, I\'m having trouble getting the surf report right now.');
+        }
       });
     });
   };
