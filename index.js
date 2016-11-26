@@ -2,6 +2,7 @@
 
 var Alexa = require('alexa-sdk');
 var SurfDataHelper = require('./surf_data_helper');
+var _ = require('lodash');
 
 exports.handler = function(event, context, callback) {
     var alexa = Alexa.handler(event, context);
@@ -40,7 +41,7 @@ var handlers = {
     'AMAZON.HelpIntent': function () {
         this.attributes['speechOutput'] = 'You can tell Alexa to ask S.F. Surf Bot how are the waves at Mavericks or Ocean Beach or Pacifica.';
         this.attributes['repromptSpeech'] = 'Where are you looking to surf?';
-        this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech'])
+        this.emit(':ask', this.attributes['speechOutput'], this.attributes['repromptSpeech']);
     },
     'AMAZON.StopIntent': function () {
         this.emit('SessionEndedRequest');
