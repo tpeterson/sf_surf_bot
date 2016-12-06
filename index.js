@@ -2,7 +2,6 @@
 
 var Alexa = require('alexa-sdk');
 var SurfDataHelper = require('./surf_data_helper');
-var _ = require('lodash');
 
 exports.handler = function(event, context, callback) {
     var alexa = Alexa.handler(event, context);
