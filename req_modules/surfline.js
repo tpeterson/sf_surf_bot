@@ -20,11 +20,12 @@ function parseReport(page) {
 
   let report = {
     spot: spot_name_edit,
-    size_num: wave_size_edit,
-    conditions: report_conditions_edit
+    size_num: wave_size_edit.length === 0 ? 'flat' : wave_size_edit,
+    conditions: report_conditions_edit.length === 0 ? 'flat' : report_conditions_edit
   };
 
-  return report;
+
+  return `The waves at ${report.spot} are ${report.size_num} and ${report.conditions}.`;
 }
 
 module.exports = parseReport;
