@@ -17,10 +17,8 @@
   },
   "homepage": "https://github.com/tpeterson/sf_surf_bot#readme",
   "dependencies": {
-    "alexa-app": "^2.3.4",
     "alexa-sdk": "^1.0.6",
-    "cheerio": "^0.20.0",
-    "lodash": "^4.17.1",
-    "request": "^2.72.0"
+    "cheerio": "^0.22.0",
+    "request": "^2.79.0"
   }
 }

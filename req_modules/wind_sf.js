@@ -33,7 +33,7 @@ function getWind() {
 
 function reqWind(req_url, cb, cb_err) {
   let req = https.request(req_url, function(res) {
-    let data = Buffer.from('');
+    let data = new Buffer(0);
 
     res.on('data', function(chunk) {
       data += chunk;
