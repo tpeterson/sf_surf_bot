@@ -27,8 +27,8 @@ var handlers = {
           echo.attributes['repromptSpeech'] = 'Where are you looking to surf?';
           echo.emit(':ask', echo.attributes['speechOutput'], echo.attributes['repromptSpeech']);
         } else {
-          var surfHelper = new SurfDataHelper();
-          surfHelper.whichSpot(locationName).then(function(report) {
+          //var surfHelper = new SurfDataHelper();
+          SurfDataHelper.whichSpot(locationName).then(function(report) {
             echo.emit(':tell', report);
           }).catch(function(err) {
             echo.attributes['speechOutput'] = `I can\'t get a surf report for ${locationName || 'that spot'}`;

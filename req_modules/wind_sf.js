@@ -1,8 +1,12 @@
 const https = require("https");
 const querystring = require('querystring');
+const crypto = require('crypto');
 
 function getWind() {
-  let endpoint = '/api/datagetter'
+  let endpoint = '/api/datagetter';
+  let app_id = crypto.randomBytes(8, function(err, buf) {
+    return buf.toString('hex');
+  });
 
   let q = querystring.stringify({
     station: '9414290',
@@ -11,7 +15,7 @@ function getWind() {
     units: 'english',
     time_zone: 'lst',
     format: 'json',
-    application: 'TIM'
+    application: app_id
   });
 
   let options = {
@@ -27,7 +31,7 @@ function getWind() {
 
 function reqWind(req_url, cb, cb_err) {
   let req = https.request(req_url, function(res) {
-    let data = new Buffer(0);
+    let data = Buffer.from('');
 
     res.on('data', function(chunk) {
       data += chunk;
